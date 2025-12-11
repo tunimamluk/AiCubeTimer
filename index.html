@@ -5,730 +5,9 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Speedcubing Timer</title>
+    <link rel="stylesheet" href="style.css">
     <meta name="description"
         content="Professional speedcubing timer with session management, statistics, and WCA-style scrambles">
-    <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-
-        :root {
-            --bg-primary: #1e1e2e;
-            --bg-secondary: #181825;
-            --text-primary: #cdd6f4;
-            --text-secondary: #a6adc8;
-            --accent: #89b4fa;
-            --accent-hover: #74c7ec;
-            --border: #313244;
-            --delete-btn: #f38ba8;
-            --timer-ready: #f38ba8;
-            --timer-running: #a6e3a1;
-        }
-
-        body.light-mode {
-            --bg-primary: #eff1f5;
-            --bg-secondary: #e6e9ef;
-            --text-primary: #4c4f69;
-            --text-secondary: #6c6f85;
-            --accent: #1e66f5;
-            --accent-hover: #04a5e5;
-            --border: #dce0e8;
-            --delete-btn: #d20f39;
-            --timer-ready: #d20f39;
-            --timer-running: #40a02b;
-        }
-
-        body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background-color: var(--bg-primary);
-            color: var(--text-primary);
-            height: 100vh;
-            overflow: hidden;
-            transition: background-color 0.3s ease, color 0.3s ease;
-        }
-
-        .container {
-            display: flex;
-            height: 100vh;
-        }
-
-        /* Header */
-        .header {
-            position: fixed;
-            top: 0;
-            right: 0;
-            padding: 1.5rem;
-            z-index: 100;
-            display: flex;
-            gap: 1rem;
-        }
-
-        .header-btn {
-            background: var(--bg-secondary);
-            border: 2px solid var(--border);
-            color: var(--text-primary);
-            padding: 0.6rem 1.2rem;
-            border-radius: 12px;
-            cursor: pointer;
-            font-size: 1rem;
-            font-weight: 600;
-            transition: all 0.3s ease;
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-        }
-
-        .header-btn:hover {
-            background: var(--accent);
-            color: var(--bg-primary);
-            transform: translateY(-2px);
-            box-shadow: 0 6px 16px rgba(0, 0, 0, 0.2);
-        }
-
-        /* Sidebar */
-        .sidebar {
-            width: 30%;
-            background-color: var(--bg-secondary);
-            border-right: 2px solid var(--border);
-            padding: 2rem;
-            display: flex;
-            flex-direction: column;
-            gap: 1.5rem;
-            overflow-y: auto;
-        }
-
-        .session-selector {
-            display: flex;
-            flex-direction: column;
-            gap: 0.8rem;
-        }
-
-        .session-selector label {
-            font-size: 0.9rem;
-            font-weight: 600;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-            color: var(--text-secondary);
-        }
-
-        .session-selector select {
-            background: var(--bg-primary);
-            border: 2px solid var(--border);
-            color: var(--text-primary);
-            padding: 0.8rem;
-            border-radius: 8px;
-            font-size: 1rem;
-            cursor: pointer;
-            transition: all 0.3s ease;
-        }
-
-        .session-selector select:hover {
-            border-color: var(--accent);
-        }
-
-        .session-selector select:focus {
-            outline: none;
-            border-color: var(--accent);
-            box-shadow: 0 0 0 3px rgba(137, 180, 250, 0.2);
-        }
-
-        .statistics {
-            background: var(--bg-primary);
-            padding: 1.5rem;
-            border-radius: 12px;
-            border: 2px solid var(--border);
-        }
-
-        .statistics h2 {
-            font-size: 1.1rem;
-            margin-bottom: 1rem;
-            color: var(--accent);
-            text-transform: uppercase;
-            letter-spacing: 1px;
-        }
-
-        .stat-item {
-            display: flex;
-            justify-content: space-between;
-            padding: 0.6rem 0;
-            border-bottom: 1px solid var(--border);
-        }
-
-        .stat-item:last-child {
-            border-bottom: none;
-        }
-
-        .stat-label {
-            font-weight: 600;
-            color: var(--text-secondary);
-        }
-
-        .stat-value {
-            font-family: 'Courier New', monospace;
-            font-size: 1.1rem;
-            font-weight: 700;
-            color: var(--accent);
-        }
-
-        .history {
-            flex: 1;
-            overflow-y: auto;
-        }
-
-        .history h2 {
-            font-size: 1.1rem;
-            margin-bottom: 1rem;
-            color: var(--accent);
-            text-transform: uppercase;
-            letter-spacing: 1px;
-        }
-
-        .history-list {
-            display: flex;
-            flex-direction: column;
-            gap: 0.5rem;
-        }
-
-        .history-item {
-            background: var(--bg-primary);
-            padding: 0.8rem 1rem;
-            border-radius: 8px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            border: 2px solid var(--border);
-            transition: all 0.2s ease;
-            cursor: pointer;
-        }
-
-        .history-item:hover {
-            border-color: var(--accent);
-            transform: translateX(4px);
-        }
-
-        .history-item.selected {
-            border-color: var(--accent);
-            background: var(--bg-secondary);
-        }
-
-        .history-time-wrapper {
-            display: flex;
-            align-items: center;
-            gap: 0.5rem;
-            flex: 1;
-        }
-
-        .history-time {
-            font-family: 'Courier New', monospace;
-            font-size: 1rem;
-            font-weight: 600;
-        }
-
-        .history-time.plus-two {
-            color: var(--accent);
-        }
-
-        .history-time.dnf {
-            color: var(--delete-btn);
-            text-decoration: line-through;
-        }
-
-        .penalty-badge {
-            font-size: 0.75rem;
-            padding: 0.2rem 0.5rem;
-            border-radius: 4px;
-            font-weight: 700;
-            text-transform: uppercase;
-        }
-
-        .penalty-badge.plus-two {
-            background: var(--accent);
-            color: white;
-        }
-
-        .penalty-badge.dnf {
-            background: var(--delete-btn);
-            color: white;
-        }
-
-        .history-actions {
-            display: flex;
-            gap: 0.5rem;
-        }
-
-        .delete-btn {
-            background: var(--delete-btn);
-            color: white;
-            border: none;
-            padding: 0.4rem 0.8rem;
-            border-radius: 6px;
-            cursor: pointer;
-            font-weight: 600;
-            transition: all 0.2s ease;
-        }
-
-        .delete-btn:hover {
-            transform: scale(1.1);
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
-        }
-
-        /* Solve Info Modal */
-        .solve-info-modal {
-            background: var(--bg-secondary);
-            border: 2px solid var(--border);
-            border-radius: 16px;
-            padding: 2rem;
-            max-width: 500px;
-            width: 90%;
-            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
-            animation: slideUp 0.3s ease;
-        }
-
-        .solve-info-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 1.5rem;
-            padding-bottom: 1rem;
-            border-bottom: 2px solid var(--border);
-        }
-
-        .solve-info-header h2 {
-            font-size: 1.5rem;
-            color: var(--accent);
-        }
-
-        .solve-info-content {
-            display: flex;
-            flex-direction: column;
-            gap: 1rem;
-        }
-
-        .info-row {
-            display: flex;
-            justify-content: space-between;
-            padding: 0.8rem;
-            background: var(--bg-primary);
-            border-radius: 8px;
-            border: 2px solid var(--border);
-        }
-
-        .info-label {
-            font-weight: 600;
-            color: var(--text-secondary);
-        }
-
-        .info-value {
-            font-family: 'Courier New', monospace;
-            font-weight: 700;
-            color: var(--text-primary);
-        }
-
-        .scramble-info {
-            background: var(--bg-primary);
-            padding: 1rem;
-            border-radius: 8px;
-            border: 2px solid var(--border);
-        }
-
-        .scramble-info-text {
-            font-family: 'Courier New', monospace;
-            font-size: 0.95rem;
-            line-height: 1.6;
-            color: var(--text-primary);
-            word-spacing: 0.3rem;
-        }
-
-        .penalty-actions {
-            display: flex;
-            gap: 0.5rem;
-            margin-top: 1rem;
-        }
-
-        .penalty-btn {
-            flex: 1;
-            padding: 0.8rem;
-            border: 2px solid var(--border);
-            border-radius: 8px;
-            background: var(--bg-primary);
-            color: var(--text-primary);
-            font-weight: 600;
-            cursor: pointer;
-            transition: all 0.3s ease;
-        }
-
-        .penalty-btn:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
-        }
-
-        .penalty-btn.ok {
-            border-color: var(--accent);
-        }
-
-        .penalty-btn.ok:hover {
-            background: var(--accent);
-            color: white;
-        }
-
-        .penalty-btn.plus-two {
-            border-color: var(--accent);
-        }
-
-        .penalty-btn.plus-two:hover,
-        .penalty-btn.plus-two.active {
-            background: var(--accent);
-            color: white;
-        }
-
-        .penalty-btn.dnf {
-            border-color: var(--delete-btn);
-        }
-
-        .penalty-btn.dnf:hover,
-        .penalty-btn.dnf.active {
-            background: var(--delete-btn);
-            color: white;
-        }
-
-        /* Main Area */
-        .main-area {
-            width: 70%;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            padding: 3rem;
-            position: relative;
-        }
-
-        .scramble-display {
-            position: absolute;
-            top: 3rem;
-            left: 50%;
-            transform: translateX(-50%);
-            width: 80%;
-            text-align: center;
-            background: var(--bg-secondary);
-            padding: 1.5rem 2rem;
-            border-radius: 16px;
-            border: 2px solid var(--border);
-            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.1);
-        }
-
-        .scramble-display h2 {
-            font-size: 0.9rem;
-            color: var(--text-secondary);
-            margin-bottom: 0.8rem;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-        }
-
-        .scramble-text {
-            font-family: 'Courier New', monospace;
-            font-size: 1.3rem;
-            line-height: 1.8;
-            color: var(--text-primary);
-            font-weight: 600;
-            word-spacing: 0.5rem;
-        }
-
-        .timer-display {
-            font-family: 'Courier New', monospace;
-            font-size: 8rem;
-            font-weight: 700;
-            color: var(--text-primary);
-            user-select: none;
-            transition: color 0.2s ease;
-            text-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-        }
-
-        .timer-display.ready {
-            color: var(--timer-ready);
-        }
-
-        .timer-display.running {
-            color: var(--timer-running);
-        }
-
-        .instruction {
-            position: absolute;
-            bottom: 3rem;
-            font-size: 1rem;
-            color: var(--text-secondary);
-            text-align: center;
-            font-weight: 500;
-        }
-
-        /* Scrollbar Styling */
-        .sidebar::-webkit-scrollbar,
-        .history::-webkit-scrollbar {
-            width: 8px;
-        }
-
-        .sidebar::-webkit-scrollbar-track,
-        .history::-webkit-scrollbar-track {
-            background: var(--bg-primary);
-            border-radius: 4px;
-        }
-
-        .sidebar::-webkit-scrollbar-thumb,
-        .history::-webkit-scrollbar-thumb {
-            background: var(--accent);
-            border-radius: 4px;
-        }
-
-        .sidebar::-webkit-scrollbar-thumb:hover,
-        .history::-webkit-scrollbar-thumb:hover {
-            background: var(--accent-hover);
-        }
-
-        /* Settings Modal */
-        .modal-overlay {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(0, 0, 0, 0.7);
-            backdrop-filter: blur(8px);
-            display: none;
-            align-items: center;
-            justify-content: center;
-            z-index: 1000;
-            animation: fadeIn 0.3s ease;
-        }
-
-        .modal-overlay.active {
-            display: flex;
-        }
-
-        @keyframes fadeIn {
-            from {
-                opacity: 0;
-            }
-
-            to {
-                opacity: 1;
-            }
-        }
-
-        .settings-modal {
-            background: var(--bg-secondary);
-            border: 2px solid var(--border);
-            border-radius: 20px;
-            padding: 2.5rem;
-            max-width: 600px;
-            width: 90%;
-            max-height: 80vh;
-            overflow-y: auto;
-            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
-            animation: slideUp 0.3s ease;
-        }
-
-        @keyframes slideUp {
-            from {
-                transform: translateY(50px);
-                opacity: 0;
-            }
-
-            to {
-                transform: translateY(0);
-                opacity: 1;
-            }
-        }
-
-        .settings-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 2rem;
-        }
-
-        .settings-header h2 {
-            font-size: 1.8rem;
-            color: var(--accent);
-            text-transform: uppercase;
-            letter-spacing: 1px;
-        }
-
-        .close-btn {
-            background: var(--delete-btn);
-            color: white;
-            border: none;
-            width: 40px;
-            height: 40px;
-            border-radius: 50%;
-            cursor: pointer;
-            font-size: 1.5rem;
-            font-weight: 700;
-            transition: all 0.3s ease;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-
-        .close-btn:hover {
-            transform: rotate(90deg) scale(1.1);
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
-        }
-
-        .settings-section {
-            margin-bottom: 2rem;
-            padding-bottom: 2rem;
-            border-bottom: 2px solid var(--border);
-        }
-
-        .settings-section:last-child {
-            border-bottom: none;
-            margin-bottom: 0;
-            padding-bottom: 0;
-        }
-
-        .settings-section h3 {
-            font-size: 1.1rem;
-            color: var(--text-primary);
-            margin-bottom: 1rem;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-        }
-
-        .setting-item {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 1rem;
-            background: var(--bg-primary);
-            border-radius: 10px;
-            margin-bottom: 0.8rem;
-            border: 2px solid var(--border);
-            transition: all 0.3s ease;
-        }
-
-        .setting-item:hover {
-            border-color: var(--accent);
-        }
-
-        .setting-label {
-            font-weight: 600;
-            color: var(--text-primary);
-        }
-
-        .setting-description {
-            font-size: 0.85rem;
-            color: var(--text-secondary);
-            margin-top: 0.3rem;
-        }
-
-        .setting-control input[type="checkbox"] {
-            width: 50px;
-            height: 26px;
-            position: relative;
-            appearance: none;
-            background: var(--border);
-            border-radius: 13px;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            outline: none;
-        }
-
-        .setting-control input[type="checkbox"]:checked {
-            background: var(--accent);
-        }
-
-        .setting-control input[type="checkbox"]::before {
-            content: '';
-            position: absolute;
-            width: 20px;
-            height: 20px;
-            border-radius: 50%;
-            background: white;
-            top: 3px;
-            left: 3px;
-            transition: all 0.3s ease;
-        }
-
-        .setting-control input[type="checkbox"]:checked::before {
-            left: 27px;
-        }
-
-        .setting-control input[type="number"],
-        .setting-control select {
-            background: var(--bg-primary);
-            border: 2px solid var(--border);
-            color: var(--text-primary);
-            padding: 0.5rem 0.8rem;
-            border-radius: 8px;
-            font-size: 1rem;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            min-width: 100px;
-        }
-
-        .setting-control input[type="number"]:focus,
-        .setting-control select:focus {
-            outline: none;
-            border-color: var(--accent);
-            box-shadow: 0 0 0 3px rgba(137, 180, 250, 0.2);
-        }
-
-        .danger-zone {
-            background: rgba(243, 139, 168, 0.1);
-            border: 2px solid var(--delete-btn);
-            border-radius: 12px;
-            padding: 1.5rem;
-        }
-
-        .danger-zone h3 {
-            color: var(--delete-btn);
-        }
-
-        .danger-btn {
-            background: var(--delete-btn);
-            color: white;
-            border: none;
-            padding: 0.8rem 1.5rem;
-            border-radius: 8px;
-            cursor: pointer;
-            font-weight: 600;
-            font-size: 1rem;
-            transition: all 0.3s ease;
-            width: 100%;
-        }
-
-        .danger-btn:hover {
-            transform: scale(1.02);
-            box-shadow: 0 6px 16px rgba(0, 0, 0, 0.3);
-        }
-
-        /* Responsive Design */
-        @media (max-width: 768px) {
-            .container {
-                flex-direction: column;
-            }
-
-            .sidebar {
-                width: 100%;
-                max-height: 40vh;
-            }
-
-            .main-area {
-                width: 100%;
-            }
-
-            .timer-display {
-                font-size: 5rem;
-            }
-
-            .scramble-text {
-                font-size: 1rem;
-            }
-
-            .settings-modal {
-                padding: 1.5rem;
-            }
-        }
-    </style>
 </head>
 
 <body>
@@ -801,6 +80,32 @@
                     </div>
                     <div class="setting-control">
                         <input type="checkbox" id="autoSaveToggle" checked>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Import/Export Settings -->
+            <div class="settings-section">
+                <h3>📥 Import/Export</h3>
+                <div class="setting-item">
+                    <div>
+                        <div class="setting-label">Import Times</div>
+                        <div class="setting-description">Import times from </div>
+                    </div>
+                    <div class="setting-control">
+                        <input type="file" id="importFile" accept=".txt,.json" style="display: none;">
+                        <button class="header-btn" id="importBtn"
+                            style="padding: 0.5rem 1rem; font-size: 0.9rem;">Choose File</button>
+                    </div>
+                </div>
+                <div class="setting-item">
+                    <div>
+                        <div class="setting-label">Export Times</div>
+                        <div class="setting-description">Export all sessions to a file</div>
+                    </div>
+                    <div class="setting-control">
+                        <button class="header-btn" id="exportBtn"
+                            style="padding: 0.5rem 1rem; font-size: 0.9rem;">Export</button>
                     </div>
                 </div>
             </div>
@@ -1059,6 +364,100 @@
             saveSettings();
         });
 
+
+        // ==================== IMPORT/EXPORT ====================
+        // Import button handler
+        document.getElementById('importBtn').addEventListener('click', () => {
+            document.getElementById('importFile').click();
+        });
+
+        // File input handler
+        document.getElementById('importFile').addEventListener('change', (e) => {
+            const file = e.target.files[0];
+            if (!file) return;
+
+            const reader = new FileReader();
+            reader.onload = (event) => {
+                try {
+                    const data = JSON.parse(event.target.result);
+                    importData(data);
+                    alert('Import successful!');
+                    updateHistory();
+                    updateStatistics();
+                } catch (error) {
+                    alert('Error importing file: ' + error.message);
+                }
+            };
+            reader.readAsText(file);
+
+            // Reset file input
+            e.target.value = '';
+        });
+
+        // Import data function
+        function importData(data) {
+            // Map session names to our format
+            const sessionMap = {
+                'session1': '3x3',
+                'session2': '2x2',
+                'session3': '4x4',
+                'session4': '5x5'
+            };
+
+            // Process each session
+            for (const [sessionName, times] of Object.entries(data)) {
+                if (sessionName === 'properties' || !Array.isArray(times)) continue;
+
+                const targetSession = sessionMap[sessionName] || '3x3';
+
+                // Convert each time entry
+                times.forEach(entry => {
+                    if (!Array.isArray(entry) || entry.length < 3) return;
+
+                    const [penaltyData, scramble, , timestamp] = entry;
+                    const [penaltyCode, time] = penaltyData;
+
+                    // Convert penalty code: 0 = ok, 2000 = +2, -1 = DNF
+                    let penalty = 'ok';
+                    if (penaltyCode === 2000) penalty = 'plus2';
+                    else if (penaltyCode === -1) penalty = 'dnf';
+
+                    // Add to session
+                    if (!sessions[targetSession]) {
+                        sessions[targetSession] = [];
+                    }
+
+                    sessions[targetSession].push({
+                        time: time,
+                        scramble: scramble,
+                        timestamp: timestamp,
+                        penalty: penalty
+                    });
+                });
+            }
+
+            saveSessions();
+        }
+
+        // Export button handler
+        document.getElementById('exportBtn').addEventListener('click', () => {
+            const exportData = {
+                sessions: sessions,
+                exportDate: new Date().toISOString()
+            };
+
+            const dataStr = JSON.stringify(exportData, null, 2);
+            const dataBlob = new Blob([dataStr], { type: 'application/json' });
+            const url = URL.createObjectURL(dataBlob);
+
+            const link = document.createElement('a');
+            link.href = url;
+            link.download = `cubetimer-export-${Date.now()}.json`;
+            link.click();
+
+            URL.revokeObjectURL(url);
+        });
+
         // Clear Session
         document.getElementById('clearSessionBtn').addEventListener('click', () => {
             if (confirm(`Are you sure you want to clear all times from ${currentSession}?`)) {
@@ -1201,6 +600,12 @@
             document.getElementById('timerDisplay').classList.remove('ready');
             document.getElementById('timerDisplay').classList.add('running');
             timerInterval = setInterval(updateTimerDisplay, 10);
+
+            // Hide all UI elements except timer
+            document.querySelector('.header').classList.add('hidden');
+            document.querySelector('.sidebar').classList.add('hidden');
+            document.querySelector('.scramble-display').classList.add('hidden');
+            document.querySelector('.instruction').classList.add('hidden');
         }
 
         function stopTimer() {
@@ -1208,6 +613,12 @@
             const elapsed = Date.now() - startTime;
             timerState = 'stopped';
             document.getElementById('timerDisplay').classList.remove('running');
+
+            // Show all UI elements again
+            document.querySelector('.header').classList.remove('hidden');
+            document.querySelector('.sidebar').classList.remove('hidden');
+            document.querySelector('.scramble-display').classList.remove('hidden');
+            document.querySelector('.instruction').classList.remove('hidden');
 
             // Save the time
             if (settings.autoSave) {
