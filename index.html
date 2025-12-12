@@ -11,10 +11,6 @@
 </head>
 
 <body>
-    <div class="header">
-        <button class="header-btn" id="settingsBtn">⚙️ Settings</button>
-        <button class="header-btn" id="themeToggle">🌙 Dark Mode</button>
-    </div>
 
     <!-- Settings Modal -->
     <div class="modal-overlay" id="settingsModal">
@@ -156,7 +152,12 @@
                     <span class="info-value" id="infoDate">-</span>
                 </div>
                 <div class="scramble-info">
-                    <div class="info-label" style="margin-bottom: 0.5rem;">Scramble:</div>
+                    <div
+                        style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.5rem;">
+                        <div class="info-label">Scramble:</div>
+                        <button class="header-btn" id="copyScrambleBtn"
+                            style="padding: 0.3rem 0.8rem; font-size: 0.8rem;">📋 Copy</button>
+                    </div>
                     <div class="scramble-info-text" id="infoScramble">-</div>
                 </div>
                 <div class="penalty-actions">
@@ -171,14 +172,25 @@
     <div class="container">
         <!-- Sidebar -->
         <div class="sidebar">
+            <!-- Settings and Theme Buttons -->
+            <div style="display: flex; gap: 0.5rem; margin-bottom: 1rem;">
+                <button class="header-btn" id="settingsBtn" style="flex: 1;">⚙️ Settings</button>
+                <button class="header-btn" id="themeToggle" style="flex: 1;">🌙 Dark Mode</button>
+            </div>
+
             <div class="session-selector">
                 <label for="sessionSelect">Session</label>
-                <select id="sessionSelect">
-                    <option value="3x3">3x3</option>
-                    <option value="2x2">2x2</option>
-                    <option value="4x4">4x4</option>
-                    <option value="5x5">5x5</option>
-                </select>
+                <div style="display: flex; gap: 0.5rem;">
+                    <select id="sessionSelect" style="flex: 1;">
+                        <!-- Options will be populated by JS -->
+                    </select>
+                    <button class="header-btn" id="renameSessionBtn" style="padding: 0 0.8rem;"
+                        title="Rename Session">✎</button>
+                    <button class="header-btn" id="createSessionBtn" style="padding: 0 0.8rem;"
+                        title="New Session">+</button>
+                    <button class="header-btn" id="deleteSessionBtn" style="padding: 0 0.8rem;"
+                        title="Delete Session">🗑️</button>
+                </div>
             </div>
 
             <div class="statistics">
@@ -204,7 +216,11 @@
         <!-- Main Area -->
         <div class="main-area">
             <div class="scramble-display">
-                <h2>Scramble</h2>
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.8rem;">
+                    <h2 style="margin: 0;">Scramble</h2>
+                    <button class="header-btn" id="copyMainScrambleBtn"
+                        style="padding: 0.3rem 0.8rem; font-size: 0.8rem;">📋 Copy</button>
+                </div>
                 <div class="scramble-text" id="scrambleText">Press SPACE to start</div>
             </div>
 
@@ -222,8 +238,19 @@
         let startTime = 0;
         let timerInterval = null;
         let currentScramble = '';
-        let currentSession = '3x3';
-        let sessions = {};
+        let currentSession = 'session1';
+        let sessions = {
+            'session1': [],
+            'session2': [],
+            'session3': [],
+            'session4': []
+        };
+        let sessionNames = {
+            'session1': 'Session 1',
+            'session2': 'Session 2',
+            'session3': 'Session 3',
+            'session4': 'Session 4'
+        };
         let isSpacePressed = false;
         let holdTimeout = null;
         let inspectionTime = 15;
@@ -300,6 +327,36 @@
         document.getElementById('penaltyOk').addEventListener('click', () => setPenalty('ok'));
         document.getElementById('penaltyPlusTwo').addEventListener('click', () => setPenalty('plus2'));
         document.getElementById('penaltyDnf').addEventListener('click', () => setPenalty('dnf'));
+
+        // Copy Scramble Button
+        document.getElementById('copyScrambleBtn').addEventListener('click', () => {
+            const scrambleText = document.getElementById('infoScramble').textContent;
+            navigator.clipboard.writeText(scrambleText).then(() => {
+                const btn = document.getElementById('copyScrambleBtn');
+                const originalText = btn.textContent;
+                btn.textContent = '✓ Copied!';
+                setTimeout(() => {
+                    btn.textContent = originalText;
+                }, 2000);
+            }).catch(err => {
+                alert('Failed to copy scramble');
+            });
+        });
+
+        // Copy Main Scramble Button
+        document.getElementById('copyMainScrambleBtn').addEventListener('click', () => {
+            const scrambleText = document.getElementById('scrambleText').textContent;
+            navigator.clipboard.writeText(scrambleText).then(() => {
+                const btn = document.getElementById('copyMainScrambleBtn');
+                const originalText = btn.textContent;
+                btn.textContent = '✓ Copied!';
+                setTimeout(() => {
+                    btn.textContent = originalText;
+                }, 2000);
+            }).catch(err => {
+                alert('Failed to copy scramble');
+            });
+        });
 
         // ==================== SETTINGS MANAGEMENT ====================
         function loadSettings() {
@@ -398,17 +455,37 @@
         function importData(data) {
             // Map session names to our format
             const sessionMap = {
-                'session1': '3x3',
-                'session2': '2x2',
-                'session3': '4x4',
-                'session4': '5x5'
+                'session1': 'session1',
+                'session2': 'session2',
+                'session3': 'session3',
+                'session4': 'session4'
             };
 
             // Process each session
             for (const [sessionName, times] of Object.entries(data)) {
                 if (sessionName === 'properties' || !Array.isArray(times)) continue;
 
-                const targetSession = sessionMap[sessionName] || '3x3';
+                let targetSession = sessionMap[sessionName];
+
+                if (!targetSession) {
+                    // If it's a known format like 'session5', use it directly if it exists, or initialize it
+                    if (sessionName.startsWith('session')) {
+                        targetSession = sessionName;
+                        if (!sessions[targetSession]) {
+                            sessions[targetSession] = [];
+                            sessionNames[targetSession] = sessionName.charAt(0).toUpperCase() + sessionName.slice(1).replace(/(\d+)/, ' $1');
+                        }
+                    } else {
+                        // Fallback to session1
+                        targetSession = 'session1';
+                    }
+                }
+
+                // Ensure session initialized
+                if (!sessions[targetSession]) {
+                    sessions[targetSession] = [];
+                    sessionNames[targetSession] = targetSession; // Fallback name
+                }
 
                 // Convert each time entry
                 times.forEach(entry => {
@@ -422,11 +499,6 @@
                     if (penaltyCode === 2000) penalty = 'plus2';
                     else if (penaltyCode === -1) penalty = 'dnf';
 
-                    // Add to session
-                    if (!sessions[targetSession]) {
-                        sessions[targetSession] = [];
-                    }
-
                     sessions[targetSession].push({
                         time: time,
                         scramble: scramble,
@@ -435,9 +507,9 @@
                     });
                 });
             }
-
-            saveSessions();
         }
+
+        saveSessions();
 
         // Export button handler
         document.getElementById('exportBtn').addEventListener('click', () => {
@@ -473,10 +545,16 @@
             if (confirm('Are you sure you want to delete ALL sessions and settings? This cannot be undone!')) {
                 localStorage.clear();
                 sessions = {
-                    '3x3': [],
-                    '2x2': [],
-                    '4x4': [],
-                    '5x5': []
+                    'session1': [],
+                    'session2': [],
+                    'session3': [],
+                    'session4': []
+                };
+                sessionNames = {
+                    'session1': 'Session 1',
+                    'session2': 'Session 2',
+                    'session3': 'Session 3',
+                    'session4': 'Session 4'
                 };
                 settings = {
                     inspectionEnabled: false,
@@ -486,6 +564,7 @@
                     autoSave: true
                 };
                 applySettings();
+                updateSessionDropdown();
                 updateHistory();
                 updateStatistics();
                 displayScramble();
@@ -602,7 +681,6 @@
             timerInterval = setInterval(updateTimerDisplay, 10);
 
             // Hide all UI elements except timer
-            document.querySelector('.header').classList.add('hidden');
             document.querySelector('.sidebar').classList.add('hidden');
             document.querySelector('.scramble-display').classList.add('hidden');
             document.querySelector('.instruction').classList.add('hidden');
@@ -615,7 +693,6 @@
             document.getElementById('timerDisplay').classList.remove('running');
 
             // Show all UI elements again
-            document.querySelector('.header').classList.remove('hidden');
             document.querySelector('.sidebar').classList.remove('hidden');
             document.querySelector('.scramble-display').classList.remove('hidden');
             document.querySelector('.instruction').classList.remove('hidden');
@@ -641,17 +718,120 @@
                 sessions = JSON.parse(saved);
             } else {
                 sessions = {
-                    '3x3': [],
-                    '2x2': [],
-                    '4x4': [],
-                    '5x5': []
+                    'session1': [],
+                    'session2': [],
+                    'session3': [],
+                    'session4': []
                 };
             }
+
+            const savedNames = localStorage.getItem('sessionNames');
+            if (savedNames) {
+                sessionNames = JSON.parse(savedNames);
+            }
+            updateSessionDropdown();
         }
 
         function saveSessions() {
             localStorage.setItem('sessions', JSON.stringify(sessions));
+            localStorage.setItem('sessionNames', JSON.stringify(sessionNames));
         }
+
+        function updateSessionDropdown() {
+            const select = document.getElementById('sessionSelect');
+            const currentValue = select.value || currentSession;
+            select.innerHTML = ''; // Clear existing options
+
+            // Sort session keys to keep them in order (approximation)
+            const sortedKeys = Object.keys(sessionNames).sort((a, b) => {
+                // Try to sort by number if possible
+                const numA = parseInt(a.replace('session', ''));
+                const numB = parseInt(b.replace('session', ''));
+                if (!isNaN(numA) && !isNaN(numB)) return numA - numB;
+                return a.localeCompare(b);
+            });
+
+            sortedKeys.forEach(key => {
+                const opt = document.createElement('option');
+                opt.value = key;
+                opt.textContent = sessionNames[key];
+                select.appendChild(opt);
+            });
+
+            // Restore selection if possible, otherwise default to first
+            if (sessionNames[currentValue]) {
+                select.value = currentValue;
+            } else if (sortedKeys.length > 0) {
+                select.value = sortedKeys[0];
+                currentSession = sortedKeys[0];
+            }
+        }
+
+        function createSession() {
+            // Find next available session ID
+            let i = 1;
+            while (sessionNames[`session${i}`]) {
+                i++;
+            }
+            const newId = `session${i}`;
+            const newName = `Session ${i}`;
+
+            // Initialize
+            sessions[newId] = [];
+            sessionNames[newId] = newName;
+
+            // Save and update UI
+            saveSessions();
+            updateSessionDropdown();
+
+            // Switch to new session
+            document.getElementById('sessionSelect').value = newId;
+            currentSession = newId;
+            updateHistory();
+            updateStatistics();
+        }
+
+        function renameCurrentSession() {
+            const newName = prompt('Enter new name for this session:', sessionNames[currentSession]);
+            if (newName && newName.trim() !== '') {
+                sessionNames[currentSession] = newName.trim();
+                saveSessions();
+                updateSessionDropdown();
+            }
+        }
+
+
+
+        function deleteSession() {
+            const sessionsCount = Object.keys(sessions).length;
+            if (sessionsCount <= 1) {
+                alert('You cannot delete the last remaining session.');
+                return;
+            }
+
+            if (confirm(`Are you sure you want to delete "${sessionNames[currentSession]}"? This cannot be undone.`)) {
+                // Delete current session
+                delete sessions[currentSession];
+                delete sessionNames[currentSession];
+
+                // Find a new session to switch to (first available)
+                const remainingSessions = Object.keys(sessions);
+                if (remainingSessions.length > 0) {
+                    currentSession = remainingSessions[0];
+                    document.getElementById('sessionSelect').value = currentSession;
+                }
+
+                saveSessions();
+                updateSessionDropdown();
+                updateHistory();
+                updateStatistics();
+            }
+        }
+
+        // Button Handlers
+        document.getElementById('renameSessionBtn').addEventListener('click', renameCurrentSession);
+        document.getElementById('createSessionBtn').addEventListener('click', createSession);
+        document.getElementById('deleteSessionBtn').addEventListener('click', deleteSession);
 
         function saveTime(time) {
             if (!sessions[currentSession]) {
@@ -669,10 +849,12 @@
         }
 
         function deleteTime(index) {
-            sessions[currentSession].splice(index, 1);
-            saveSessions();
-            updateHistory();
-            updateStatistics();
+            if (confirm('Are you sure you want to delete this time?')) {
+                sessions[currentSession].splice(index, 1);
+                saveSessions();
+                updateHistory();
+                updateStatistics();
+            }
         }
 
         function updateHistory() {
