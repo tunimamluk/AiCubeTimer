@@ -2,6 +2,7 @@
 <html lang="en">
 
 <head>
+    <!-- header -->
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Speedcubing Timer</title>
@@ -86,7 +87,7 @@
                 <div class="setting-item">
                     <div>
                         <div class="setting-label">Import Times</div>
-                        <div class="setting-description">Import times from </div>
+                        <div class="setting-description">Import times from JSON file</div>
                     </div>
                     <div class="setting-control">
                         <input type="file" id="importFile" accept=".txt,.json" style="display: none;">
@@ -96,12 +97,22 @@
                 </div>
                 <div class="setting-item">
                     <div>
-                        <div class="setting-label">Export Times</div>
-                        <div class="setting-description">Export all sessions to a file</div>
+                        <div class="setting-label">Export All Data</div>
+                        <div class="setting-description">Export all sessions to a JSON file</div>
                     </div>
                     <div class="setting-control">
                         <button class="header-btn" id="exportBtn"
-                            style="padding: 0.5rem 1rem; font-size: 0.9rem;">Export</button>
+                            style="padding: 0.5rem 1rem; font-size: 0.9rem;">Export JSON</button>
+                    </div>
+                </div>
+                <div class="setting-item">
+                    <div>
+                        <div class="setting-label">Export Session (CSV)</div>
+                        <div class="setting-description">Export current session to CSV for Sheets</div>
+                    </div>
+                    <div class="setting-control">
+                        <button class="header-btn" id="exportCsvBtn"
+                            style="padding: 0.5rem 1rem; font-size: 0.9rem;">Export CSV</button>
                     </div>
                 </div>
             </div>
@@ -525,6 +536,46 @@
             const link = document.createElement('a');
             link.href = url;
             link.download = `cubetimer-export-${Date.now()}.json`;
+            link.click();
+
+            URL.revokeObjectURL(url);
+        });
+
+        // Export CSV button handler
+        document.getElementById('exportCsvBtn').addEventListener('click', () => {
+            const times = sessions[currentSession] || [];
+
+            if (times.length === 0) {
+                alert('No times to export in current session.');
+                return;
+            }
+
+            // CSV Header
+            let csvContent = "Date,Time,Penalty,Scramble\n";
+
+            // CSV Data
+            times.forEach(solve => {
+                const date = new Date(solve.timestamp).toLocaleString().replace(',', ''); // Simple format, avoid commas
+
+                let time = formatTime(solve.time);
+
+                // Handle formatting consistent with display
+                // The raw 'time' is in MS. formatTime converts to S.MS
+
+                const penalty = solve.penalty || 'ok';
+                let penaltyText = '';
+                if (penalty === 'plus2') penaltyText = '+2';
+                else if (penalty === 'dnf') penaltyText = 'DNF';
+
+                csvContent += `"${date}","${time}","${penaltyText}","${solve.scramble}"\n`;
+            });
+
+            const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+            const url = URL.createObjectURL(blob);
+
+            const link = document.createElement('a');
+            link.href = url;
+            link.setAttribute('download', `${sessionNames[currentSession].replace(/[^a-z0-9]/gi, '_').toLowerCase()}_export.csv`);
             link.click();
 
             URL.revokeObjectURL(url);
