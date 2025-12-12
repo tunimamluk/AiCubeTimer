@@ -552,6 +552,15 @@
         // Settings Modal Controls
         document.getElementById('settingsBtn').addEventListener('click', () => {
             document.getElementById('settingsModal').classList.add('active');
+
+            // Close sidebar if open (mobile optimization)
+            const sidebar = document.querySelector('.sidebar');
+            if (sidebar.classList.contains('active')) {
+                sidebar.classList.remove('active');
+                if (document.getElementById('mobileMenuBtn')) {
+                    document.getElementById('mobileMenuBtn').textContent = '☰';
+                }
+            }
         });
 
         document.getElementById('closeSettings').addEventListener('click', () => {
@@ -871,9 +880,19 @@
 
         // ==================== TIMER LOGIC ====================
         function formatTime(ms) {
-            const seconds = Math.floor(ms / 1000);
+            const totalSeconds = Math.floor(ms / 1000);
+            const minutes = Math.floor(totalSeconds / 60);
+            const seconds = totalSeconds % 60;
             const milliseconds = Math.floor((ms % 1000) / 10);
-            return `${seconds}.${milliseconds.toString().padStart(2, '0')}`;
+
+            const msStr = milliseconds.toString().padStart(2, '0');
+
+            if (minutes > 0) {
+                const secStr = seconds.toString().padStart(2, '0');
+                return `${minutes}:${secStr}.${msStr}`;
+            } else {
+                return `${seconds}.${msStr}`;
+            }
         }
 
         function updateTimerDisplay() {
@@ -882,6 +901,13 @@
             } else {
                 const elapsed = Date.now() - startTime;
                 document.getElementById('timerDisplay').textContent = formatTime(elapsed);
+
+                // Adjust font size for long times (mobile optimization)
+                if (elapsed >= 60000) {
+                    document.getElementById('timerDisplay').classList.add('long-time');
+                } else {
+                    document.getElementById('timerDisplay').classList.remove('long-time');
+                }
             }
         }
 

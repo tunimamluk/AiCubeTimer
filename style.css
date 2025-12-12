@@ -851,6 +851,11 @@ body {
         font-size: 8rem;
     }
 
+    .timer-display.long-time {
+        font-size: 5rem !important;
+        /* Smaller size for MM:SS.ms */
+    }
+
     .scramble-display {
         width: 95%;
         top: 5rem;
