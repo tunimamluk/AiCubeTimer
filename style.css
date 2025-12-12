@@ -465,6 +465,62 @@ body {
     z-index: 200;
 }
 
+/* Custom Appearance Overrides */
+:root {
+    --timer-font: 'Courier New', monospace;
+}
+
+.timer-display {
+    font-family: var(--timer-font);
+    color: var(--timer-custom-color, var(--text-primary));
+    /* Use custom or fallback */
+}
+
+/* Override .ready color if custom color is not set, BUT we want custom color to persist? 
+   Actually, usually users want the ready/running colors to stay ready/running colors.
+   The request was "change the timer colors". 
+   Let's assume "Timer Color" means the IDLE color. 
+   If they want to change all colors, that's more complex. 
+   For now, applying custom color to the idle state.
+   AND we need to make sure ready/running override it if they are active classes.
+*/
+
+.timer-display.ready {
+    color: var(--timer-ready) !important;
+}
+
+.timer-display.running {
+    color: var(--timer-running) !important;
+}
+
+.main-area.has-bg {
+    background-image: var(--main-bg-image);
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    position: relative;
+}
+
+/* Add overlay to ensure text is readable on bg image */
+.main-area.has-bg::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.4);
+    /* Semi-transparent overlay */
+    z-index: 0;
+    pointer-events: none;
+}
+
+/* Ensure content is above overlay */
+.main-area.has-bg>* {
+    z-index: 1;
+    position: relative;
+}
+
 .instruction {
     position: absolute;
     bottom: 3rem;

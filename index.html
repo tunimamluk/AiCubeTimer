@@ -80,13 +80,45 @@
                 </div>
             </div>
 
+            <!-- Appearance Settings -->
+            <div class="settings-section">
+                <h3>🎨 Appearance</h3>
+                <div class="setting-item">
+                    <div>
+                        <div class="setting-label">Timer Color</div>
+                        <div class="setting-description">Custom color for the timer display</div>
+                    </div>
+                    <div class="setting-control">
+                        <input type="color" id="timerColorPicker" value="#cdd6f4">
+                        <button class="header-btn" id="resetColorBtn"
+                            style="padding: 0.2rem 0.5rem; font-size: 0.8rem; margin-left: 0.5rem;">Reset</button>
+                    </div>
+                </div>
+                <div class="setting-item">
+                    <div>
+                        <div class="setting-label">Timer Font</div>
+                        <div class="setting-description">Font style for the timer</div>
+                    </div>
+                    <div class="setting-control">
+                        <select id="timerFontSelect">
+                            <option value="'Courier New', monospace">Courier New</option>
+                            <option value="'Segoe UI', sans-serif">Segoe UI</option>
+                            <option value="'Roboto Mono', monospace">Roboto Mono</option>
+                            <option value="'Arial', sans-serif">Arial</option>
+                            <option value="'Verdana', sans-serif">Verdana</option>
+                            <option value="'Impact', sans-serif">Impact</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+
             <!-- Import/Export Settings -->
             <div class="settings-section">
                 <h3>📥 Import/Export</h3>
                 <div class="setting-item">
                     <div>
                         <div class="setting-label">Import Times</div>
-                        <div class="setting-description">Import times from </div>
+                        <div class="setting-description">Import times from JSON file</div>
                     </div>
                     <div class="setting-control">
                         <input type="file" id="importFile" accept=".txt,.json" style="display: none;">
@@ -263,7 +295,10 @@
             holdTime: 0,
             hideTimer: false,
             scrambleLength: 20,
-            autoSave: true
+            autoSave: true,
+            timerColor: null,
+            timerFont: "'Courier New', monospace",
+            backgroundImage: null
         };
 
         // ==================== SOLVE INFO MODAL ====================
@@ -377,6 +412,19 @@
             document.getElementById('hideTimerToggle').checked = settings.hideTimer;
             document.getElementById('scrambleLength').value = settings.scrambleLength;
             document.getElementById('autoSaveToggle').checked = settings.autoSave;
+
+            // Appearance
+            if (settings.timerColor) {
+                document.getElementById('timerColorPicker').value = settings.timerColor;
+                document.documentElement.style.setProperty('--timer-custom-color', settings.timerColor);
+            } else {
+                document.documentElement.style.removeProperty('--timer-custom-color');
+                // Reset picker to theme default (approximate)
+                document.getElementById('timerColorPicker').value = '#cdd6f4';
+            }
+
+            document.getElementById('timerFontSelect').value = settings.timerFont || "'Courier New', monospace";
+            document.documentElement.style.setProperty('--timer-font', settings.timerFont || "'Courier New', monospace");
         }
 
         // Settings Modal Controls
@@ -418,6 +466,28 @@
 
         document.getElementById('autoSaveToggle').addEventListener('change', (e) => {
             settings.autoSave = e.target.checked;
+            saveSettings();
+        });
+
+        // Appearance Change Handlers
+        document.getElementById('timerColorPicker').addEventListener('input', (e) => {
+            settings.timerColor = e.target.value;
+            applySettings(); // Apply immediately for preview
+        });
+
+        document.getElementById('timerColorPicker').addEventListener('change', () => {
+            saveSettings(); // Save on final selection
+        });
+
+        document.getElementById('resetColorBtn').addEventListener('click', () => {
+            settings.timerColor = null;
+            applySettings();
+            saveSettings();
+        });
+
+        document.getElementById('timerFontSelect').addEventListener('change', (e) => {
+            settings.timerFont = e.target.value;
+            applySettings();
             saveSettings();
         });
 
