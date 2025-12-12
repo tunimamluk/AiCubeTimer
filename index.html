@@ -236,6 +236,9 @@
     </div>
 
     <div class="container">
+        <!-- Mobile Menu Button -->
+        <button class="menu-btn" id="mobileMenuBtn">☰</button>
+
         <!-- Sidebar -->
         <div class="sidebar">
             <!-- Settings and Theme Buttons -->
@@ -1233,6 +1236,71 @@
         });
 
         // ==================== EVENT HANDLERS ====================
+        // Mobile Menu Toggle
+        const mobileMenuBtn = document.getElementById('mobileMenuBtn');
+        const sidebar = document.querySelector('.sidebar');
+
+        mobileMenuBtn.addEventListener('click', () => {
+            sidebar.classList.toggle('active');
+            // Change icon
+            mobileMenuBtn.textContent = sidebar.classList.contains('active') ? '✕' : '☰';
+        });
+
+        // Touch Support (Mobile Timer)
+        const mainArea = document.querySelector('.main-area');
+
+        mainArea.addEventListener('touchstart', (e) => {
+            // Prevent default behavior if needed (e.g. scrolling/zooming) 
+            // BUT we want to allow clicking buttons inside mainArea (like copy scramble)
+            // So we only intercept if the target is the mainArea or timer display
+            if (e.target.closest('button')) return; // Allow button clicks
+            if (e.target.closest('.scramble-display')) return; // Allow copying text? Maybe not needed.
+
+            // Ignore if using stackmat
+            if (settings.inputSource === 'stackmat') return;
+
+            e.preventDefault(); // Stop scrolling/zoom
+
+            if (isSpacePressed) return;
+            isSpacePressed = true;
+
+            if (timerState === 'running') {
+                stopTimer();
+            } else if (timerState === 'idle' || timerState === 'stopped') {
+                // If inspection enabled?
+                if (settings.inspectionEnabled) {
+                    startInspection();
+                } else {
+                    document.getElementById('timerDisplay').style.color = 'var(--timer-ready)';
+                    // Prepare to start
+                    holdTimeout = setTimeout(() => {
+                        timerState = 'ready';
+                        document.getElementById('timerDisplay').classList.add('ready');
+                    }, settings.holdTime);
+                }
+            } else if (timerState === 'inspection') {
+                // Holding during inspection -> ready
+                document.getElementById('timerDisplay').style.color = 'var(--timer-ready)';
+                timerState = 'ready'; // Simplified for touch inspection
+            }
+        }, { passive: false });
+
+        mainArea.addEventListener('touchend', (e) => {
+            if (e.target.closest('button')) return;
+            if (settings.inputSource === 'stackmat') return;
+
+            // e.preventDefault(); // usually not needed on touchend but safer
+
+            isSpacePressed = false;
+            if (holdTimeout) clearTimeout(holdTimeout);
+            document.getElementById('timerDisplay').style.color = ''; // Reset inline color
+
+            if (timerState === 'ready') {
+                startTimer();
+            }
+        });
+
+
         document.addEventListener('keydown', (e) => {
             if (e.code !== 'Space') return;
             // Ignore spacebar if using stackmat
