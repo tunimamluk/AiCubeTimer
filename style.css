@@ -89,6 +89,12 @@ body {
     color: white;
 }
 
+.menu-btn.hidden {
+    opacity: 0;
+    visibility: hidden;
+    pointer-events: none;
+}
+
 .header-btn {
     background: var(--bg-secondary);
     border: 2px solid var(--border);

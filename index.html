@@ -948,6 +948,7 @@
             document.querySelector('.sidebar').classList.add('hidden');
             document.querySelector('.scramble-display').classList.add('hidden');
             document.querySelector('.instruction').classList.add('hidden');
+            if (document.getElementById('mobileMenuBtn')) document.getElementById('mobileMenuBtn').classList.add('hidden');
         }
 
         function stopTimer() {
@@ -960,6 +961,7 @@
             document.querySelector('.sidebar').classList.remove('hidden');
             document.querySelector('.scramble-display').classList.remove('hidden');
             document.querySelector('.instruction').classList.remove('hidden');
+            if (document.getElementById('mobileMenuBtn')) document.getElementById('mobileMenuBtn').classList.remove('hidden');
 
             // Save the time
             if (settings.autoSave) {
