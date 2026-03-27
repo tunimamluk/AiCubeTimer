@@ -33,10 +33,10 @@ export default function SessionSelector() {
 
   return (
     <div className="session-selector">
-      <div style={{ display: 'flex', gap: '0.4rem', alignItems: 'center' }}>
+      <div style={{ display: 'flex', gap: '0.4rem', alignItems: 'center', overflow: 'hidden' }}>
         <select
           id="sessionSelect"
-          style={{ flex: 1 }}
+          style={{ flex: 1, minWidth: 0 }}
           value={currentSession}
           onChange={e => setCurrentSession(e.target.value)}
         >
@@ -46,7 +46,7 @@ export default function SessionSelector() {
         </select>
         <button
           className="header-btn"
-          style={{ padding: '0.4rem 0.7rem', fontSize: '0.8rem', whiteSpace: 'nowrap' }}
+          style={{ padding: '0.4rem 0.6rem', fontSize: '0.8rem', flexShrink: 0 }}
           onClick={() => setOptionsOpen(o => !o)}
           title="Session options"
         >
