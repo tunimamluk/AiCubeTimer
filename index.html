@@ -290,8 +290,12 @@
             <div class="scramble-display">
                 <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.8rem;">
                     <h2 style="margin: 0;">Scramble</h2>
-                    <button class="header-btn" id="copyMainScrambleBtn"
-                        style="padding: 0.3rem 0.8rem; font-size: 0.8rem;">📋 Copy</button>
+                    <div style="display: flex; gap: 0.5rem;">
+                        <button class="header-btn" id="copyMainScrambleBtn"
+                            style="padding: 0.3rem 0.8rem; font-size: 0.8rem;">📋 Copy</button>
+                        <button class="header-btn" id="nextScrambleBtn"
+                            style="padding: 0.3rem 0.8rem; font-size: 0.8rem;">Next &#8594;</button>
+                    </div>
                 </div>
                 <div class="scramble-text" id="scrambleText">Press SPACE to start</div>
             </div>
@@ -427,6 +431,11 @@
             });
         });
 
+        // Next Scramble Button
+        document.getElementById('nextScrambleBtn').addEventListener('click', () => {
+            displayScramble();
+        });
+
         // Copy Main Scramble Button
         document.getElementById('copyMainScrambleBtn').addEventListener('click', () => {
             const scrambleText = document.getElementById('scrambleText').textContent;
@@ -462,7 +471,6 @@
             document.getElementById('holdTime').value = settings.holdTime;
             document.getElementById('scrambleLength').value = settings.scrambleLength;
             document.getElementById('autoSaveToggle').checked = settings.autoSave;
-
             // Appearance
             if (settings.timerColor) {
                 document.getElementById('timerColorPicker').value = settings.timerColor;
