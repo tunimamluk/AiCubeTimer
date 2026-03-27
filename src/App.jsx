@@ -18,7 +18,6 @@ function AppInner() {
   return (
     <div className={theme === 'light' ? 'light-mode' : ''}>
       <Header
-        onOpenSettings={() => setSettingsOpen(true)}
         onToggleSidebar={() => setSidebarOpen(o => !o)}
         sidebarOpen={sidebarOpen}
         timerState={timer.timerState}
@@ -28,6 +27,7 @@ function AppInner() {
           isOpen={sidebarOpen}
           onClose={() => setSidebarOpen(false)}
           onOpenSolve={setSolveInfoIndex}
+          onOpenSettings={() => setSettingsOpen(true)}
           timerState={timer.timerState}
         />
         <MainArea
