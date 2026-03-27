@@ -3,7 +3,7 @@ import { createContext, useContext, useState, useEffect } from 'react';
 const DEFAULT_SETTINGS = {
   inputSource: 'keyboard',
   inspectionEnabled: false,
-  holdTime: 0,
+  holdTime: 3,
   scrambleLength: 20,
   autoSave: true,
   timerColor: null,
