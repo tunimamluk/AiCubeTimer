@@ -33,12 +33,26 @@ export default function SolveInfoModal({ index, onClose, setPenaltyCallback }) {
     navigator.clipboard.writeText(solve.scramble || '').catch(() => {});
   };
 
+  const copySolve = () => {
+    const d = new Date(solve.timestamp);
+    const pad = n => String(n).padStart(2, '0');
+    const dateStr = `@${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())} ${pad(d.getHours())}:${pad(d.getMinutes())}:${pad(d.getSeconds())}`;
+    const timeStr = penalty === 'dnf' ? 'DNF' : formatTime(penalty === 'plus2' ? solve.time + 2000 : solve.time);
+    const text = `${timeStr}   ${solve.scramble || ''}   ${dateStr}`;
+    navigator.clipboard.writeText(text).catch(() => {});
+  };
+
   return (
     <div className="modal-overlay active" onClick={e => { if (e.target === e.currentTarget) onClose(); }}>
       <div className="solve-info-modal">
         <div className="solve-info-header">
           <h3 style={{ margin: 0 }}>Solve Info</h3>
-          <button className="close-btn" id="closeSolveInfo" onClick={onClose}>✕</button>
+          <div style={{ display: 'flex', gap: '0.5rem', alignItems: 'center' }}>
+            <button className="header-btn" style={{ padding: '0.3rem 0.8rem', fontSize: '0.8rem' }} onClick={copySolve}>
+              📋 Copy Solve
+            </button>
+            <button className="close-btn" id="closeSolveInfo" onClick={onClose}>✕</button>
+          </div>
         </div>
         <div className="solve-info-content">
           <div className="info-row">
