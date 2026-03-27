@@ -628,10 +628,12 @@ body {
     border: 2px solid var(--border);
     border-radius: 20px;
     padding: 2.5rem;
-    max-width: 600px;
-    width: 90%;
-    max-height: 80vh;
-    overflow-y: auto;
+    max-width: 680px;
+    width: 95%;
+    max-height: 85vh;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
     box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
     animation: slideUp 0.3s ease;
 }
@@ -652,7 +654,63 @@ body {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    margin-bottom: 2rem;
+    margin-bottom: 1.5rem;
+}
+
+/* Settings body: nav + content side by side */
+.settings-body {
+    display: flex;
+    gap: 1.2rem;
+    min-height: 0;
+}
+
+.settings-nav {
+    display: flex;
+    flex-direction: column;
+    gap: 0.3rem;
+    min-width: 120px;
+    flex-shrink: 0;
+    padding-top: 0.2rem;
+}
+
+.settings-nav-item {
+    background: var(--bg-primary);
+    border: 2px solid var(--border);
+    color: var(--text-secondary);
+    padding: 0.6rem 0.8rem;
+    border-radius: 10px;
+    cursor: pointer;
+    font-size: 0.85rem;
+    font-weight: 600;
+    text-align: left;
+    transition: all 0.2s ease;
+    white-space: nowrap;
+}
+
+.settings-nav-item:hover {
+    border-color: var(--accent);
+    color: var(--text-primary);
+}
+
+.settings-nav-item.active {
+    background: var(--accent);
+    border-color: var(--accent);
+    color: var(--bg-primary);
+}
+
+.settings-nav-item.danger:hover,
+.settings-nav-item.danger.active {
+    background: var(--delete-btn);
+    border-color: var(--delete-btn);
+    color: white;
+}
+
+.settings-content {
+    flex: 1;
+    overflow-y: auto;
+    max-height: 60vh;
+    min-width: 0;
+    scroll-behavior: smooth;
 }
 
 .settings-header h2 {
@@ -887,5 +945,29 @@ body {
     .settings-modal {
         padding: 1.5rem;
         width: 95%;
+        max-height: 90vh;
+    }
+
+    .settings-body {
+        flex-direction: column;
+        gap: 0.8rem;
+    }
+
+    .settings-nav {
+        flex-direction: row;
+        flex-wrap: nowrap;
+        overflow-x: auto;
+        gap: 0.4rem;
+        padding-bottom: 0.2rem;
+    }
+
+    .settings-nav-item {
+        flex-shrink: 0;
+        font-size: 0.8rem;
+        padding: 0.5rem 0.7rem;
+    }
+
+    .settings-content {
+        max-height: 55vh;
     }
 }

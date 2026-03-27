@@ -21,8 +21,18 @@
                 <button class="close-btn" id="closeSettings">✕</button>
             </div>
 
+            <div class="settings-body">
+            <nav class="settings-nav">
+                <button class="settings-nav-item active" data-target="section-timer">⏱️ Timer</button>
+                <button class="settings-nav-item" data-target="section-display">🖥️ Display</button>
+                <button class="settings-nav-item" data-target="section-session">📊 Session</button>
+                <button class="settings-nav-item" data-target="section-appearance">🎨 Appearance</button>
+                <button class="settings-nav-item" data-target="section-importexport">📥 Data</button>
+                <button class="settings-nav-item danger" data-target="section-danger">⚠️ Danger</button>
+            </nav>
+            <div class="settings-content">
             <!-- Timer Settings -->
-            <div class="settings-section">
+            <div class="settings-section" id="section-timer">
                 <h3>⏱️ Timer Settings</h3>
                 <div class="setting-item">
                     <div>
@@ -68,17 +78,8 @@
             </div>
 
             <!-- Display Settings -->
-            <div class="settings-section">
-                <h3>� Display Settings</h3>
-                <div class="setting-item">
-                    <div>
-                        <div class="setting-label">Hide Timer While Running</div>
-                        <div class="setting-description">Hide timer display during solve</div>
-                    </div>
-                    <div class="setting-control">
-                        <input type="checkbox" id="hideTimerToggle">
-                    </div>
-                </div>
+            <div class="settings-section" id="section-display">
+                <h3>🖥️ Display Settings</h3>
                 <div class="setting-item">
                     <div>
                         <div class="setting-label">Scramble Length</div>
@@ -91,7 +92,7 @@
             </div>
 
             <!-- Session Settings -->
-            <div class="settings-section">
+            <div class="settings-section" id="section-session">
                 <h3>📊 Session Settings</h3>
                 <div class="setting-item">
                     <div>
@@ -105,7 +106,7 @@
             </div>
 
             <!-- Appearance Settings -->
-            <div class="settings-section">
+            <div class="settings-section" id="section-appearance">
                 <h3>🎨 Appearance</h3>
                 <div class="setting-item">
                     <div>
@@ -137,7 +138,7 @@
             </div>
 
             <!-- Import/Export Settings -->
-            <div class="settings-section">
+            <div class="settings-section" id="section-importexport">
                 <h3>📥 Import/Export</h3>
                 <div class="setting-item">
                     <div>
@@ -173,7 +174,7 @@
             </div>
 
             <!-- Danger Zone -->
-            <div class="settings-section danger-zone">
+            <div class="settings-section danger-zone" id="section-danger">
                 <h3>⚠️ Danger Zone</h3>
                 <div class="setting-item">
                     <div>
@@ -194,6 +195,8 @@
                     </div>
                 </div>
             </div>
+            </div><!-- end settings-content -->
+            </div><!-- end settings-body -->
         </div>
     </div>
 
@@ -340,7 +343,6 @@
             inputSource: 'keyboard', // keyboard, stackmat
             inspectionEnabled: false,
             holdTime: 0,
-            hideTimer: false,
             scrambleLength: 20,
             autoSave: true,
             timerColor: null,
@@ -458,7 +460,6 @@
         function applySettings() {
             document.getElementById('inspectionToggle').checked = settings.inspectionEnabled;
             document.getElementById('holdTime').value = settings.holdTime;
-            document.getElementById('hideTimerToggle').checked = settings.hideTimer;
             document.getElementById('scrambleLength').value = settings.scrambleLength;
             document.getElementById('autoSaveToggle').checked = settings.autoSave;
 
@@ -549,6 +550,18 @@
             }
         }
 
+        // Settings Nav
+        document.querySelectorAll('.settings-nav-item').forEach(btn => {
+            btn.addEventListener('click', () => {
+                document.querySelectorAll('.settings-nav-item').forEach(b => b.classList.remove('active'));
+                btn.classList.add('active');
+                const target = document.getElementById(btn.dataset.target);
+                if (target) {
+                    target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                }
+            });
+        });
+
         // Settings Modal Controls
         document.getElementById('settingsBtn').addEventListener('click', () => {
             document.getElementById('settingsModal').classList.add('active');
@@ -587,11 +600,6 @@
 
         document.getElementById('holdTime').addEventListener('change', (e) => {
             settings.holdTime = parseInt(e.target.value);
-            saveSettings();
-        });
-
-        document.getElementById('hideTimerToggle').addEventListener('change', (e) => {
-            settings.hideTimer = e.target.checked;
             saveSettings();
         });
 
@@ -806,7 +814,6 @@
                 settings = {
                     inspectionEnabled: false,
                     holdTime: 0,
-                    hideTimer: false,
                     scrambleLength: 20,
                     autoSave: true
                 };
@@ -896,18 +903,14 @@
         }
 
         function updateTimerDisplay() {
-            if (settings.hideTimer && timerState === 'running') {
-                document.getElementById('timerDisplay').textContent = 'Solving...';
-            } else {
-                const elapsed = Date.now() - startTime;
-                document.getElementById('timerDisplay').textContent = formatTime(elapsed);
+            const elapsed = Date.now() - startTime;
+            document.getElementById('timerDisplay').textContent = formatTime(elapsed);
 
-                // Adjust font size for long times (mobile optimization)
-                if (elapsed >= 60000) {
-                    document.getElementById('timerDisplay').classList.add('long-time');
-                } else {
-                    document.getElementById('timerDisplay').classList.remove('long-time');
-                }
+            // Adjust font size for long times (mobile optimization)
+            if (elapsed >= 60000) {
+                document.getElementById('timerDisplay').classList.add('long-time');
+            } else {
+                document.getElementById('timerDisplay').classList.remove('long-time');
             }
         }
 
