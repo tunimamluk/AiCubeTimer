@@ -78,12 +78,13 @@ export function useTimer() {
     }, 1000);
   }, [setState]);
 
-  // Keyboard handler
+  // Keyboard handler — re-registers whenever relevant settings change
+  const { holdTime, inputSource, inspectionEnabled } = settings;
   useEffect(() => {
     const onKeyDown = (e) => {
       if (e.code !== 'Space') return;
       if (e.target.tagName === 'INPUT' || e.target.tagName === 'SELECT' || e.target.tagName === 'TEXTAREA') return;
-      if (settingsRef.current.inputSource === 'stackmat') return;
+      if (inputSource === 'stackmat') return;
       e.preventDefault();
       if (isDownRef.current) return;
       isDownRef.current = true;
@@ -103,19 +104,19 @@ export function useTimer() {
       }
 
       if (stateRef.current === 'idle') {
-        const holdTime = settingsRef.current.holdTime || 0;
-        if (holdTime > 0) {
+        const ht = holdTime || 0;
+        if (ht > 0) {
           holdTimeoutRef.current = setTimeout(() => {
             if (isDownRef.current) {
-              if (settingsRef.current.inspectionEnabled) {
+              if (inspectionEnabled) {
                 startInspection();
               } else {
                 setState('ready');
               }
             }
-          }, holdTime);
+          }, ht);
         } else {
-          if (settingsRef.current.inspectionEnabled) {
+          if (inspectionEnabled) {
             startInspection();
           } else {
             setState('ready');
@@ -126,7 +127,7 @@ export function useTimer() {
 
     const onKeyUp = (e) => {
       if (e.code !== 'Space') return;
-      if (settingsRef.current.inputSource === 'stackmat') return;
+      if (inputSource === 'stackmat') return;
       e.preventDefault();
       isDownRef.current = false;
 
@@ -148,7 +149,7 @@ export function useTimer() {
       document.removeEventListener('keydown', onKeyDown);
       document.removeEventListener('keyup', onKeyUp);
     };
-  }, [startTimer, stopTimer, startInspection, setState]);
+  }, [startTimer, stopTimer, startInspection, setState, holdTime, inputSource, inspectionEnabled]);
 
   // Penalty keybinds (1/2/3) — exposed via a penalty callback set by SolveInfoModal
   const penaltyCallbackRef = useRef(null);
