@@ -1,4 +1,4 @@
-import { useRef } from 'react';
+import { useRef, useState } from 'react';
 import { useApp } from '../../context/AppContext';
 import { formatTime } from '../../utils/formatTime';
 
@@ -27,6 +27,7 @@ export default function SettingsModal({ onClose }) {
   } = useApp();
 
   const contentRef = useRef(null);
+  const [copied, setCopied] = useState(false);
   const importFileRef = useRef(null);
 
   const scrollTo = (id) => {
@@ -47,7 +48,7 @@ export default function SettingsModal({ onClose }) {
     URL.revokeObjectURL(url);
   };
 
-  const exportCsv = () => {
+  const copySession = () => {
     const solves = sessions[currentSession] || [];
     const rows = [['#', 'Time', 'Penalty', 'Scramble', 'Date']];
     solves.forEach((s, i) => {
@@ -55,14 +56,11 @@ export default function SettingsModal({ onClose }) {
       const time = penalty === 'dnf' ? 'DNF' : formatTime(penalty === 'plus2' ? s.time + 2000 : s.time);
       rows.push([i + 1, time, penalty, s.scramble, new Date(s.timestamp).toLocaleString()]);
     });
-    const csv = rows.map(r => r.map(c => `"${String(c).replace(/"/g, '""')}"`).join(',')).join('\n');
-    const blob = new Blob([csv], { type: 'text/csv' });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = `cubetimer-${sessionNames[currentSession]}-${Date.now()}.csv`;
-    a.click();
-    URL.revokeObjectURL(url);
+    const csv = rows.map(r => r.join('\t')).join('\n');
+    navigator.clipboard.writeText(csv).then(() => {
+      setCopied(true);
+      setTimeout(() => setCopied(false), 2000);
+    }).catch(() => {});
   };
 
   const handleImport = (e) => {
@@ -250,11 +248,13 @@ export default function SettingsModal({ onClose }) {
               </div>
               <div className="setting-item">
                 <div>
-                  <div className="setting-label">Export CSV</div>
-                  <div className="setting-description">Export current session as CSV</div>
+                  <div className="setting-label">Copy Session</div>
+                  <div className="setting-description">Copy session as tab-separated table</div>
                 </div>
                 <div className="setting-control">
-                  <button className="header-btn" style={{ padding: '0.4rem 0.8rem', fontSize: '0.8rem' }} onClick={exportCsv}>📊 Export CSV</button>
+                  <button className="header-btn" style={{ padding: '0.4rem 0.8rem', fontSize: '0.8rem' }} onClick={copySession}>
+                    {copied ? '✓ Copied!' : '📋 Copy Session'}
+                  </button>
                 </div>
               </div>
             </div>
