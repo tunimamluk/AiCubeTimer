@@ -13,7 +13,7 @@
     --accent-hover: #74c7ec;
     --border: #313244;
     --delete-btn: #f38ba8;
-    --timer-ready: #f38ba8;
+    --timer-ready: #a6e3a1;
     --timer-running: #a6e3a1;
 }
 
@@ -26,7 +26,7 @@ body.light-mode {
     --accent-hover: #04a5e5;
     --border: #dce0e8;
     --delete-btn: #d20f39;
-    --timer-ready: #d20f39;
+    --timer-ready: #40a02b;
     --timer-running: #40a02b;
 }
 
