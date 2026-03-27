@@ -628,9 +628,9 @@ body {
     border: 2px solid var(--border);
     border-radius: 20px;
     padding: 2.5rem;
-    max-width: 680px;
+    max-width: 780px;
     width: 95%;
-    max-height: 85vh;
+    max-height: 90vh;
     overflow: hidden;
     display: flex;
     flex-direction: column;
@@ -712,7 +712,7 @@ body {
 .settings-content {
     flex: 1;
     overflow-y: auto;
-    max-height: 60vh;
+    min-height: 0;
     min-width: 0;
     scroll-behavior: smooth;
 }
