@@ -436,6 +436,11 @@ body {
     justify-content: center;
     padding: 3rem;
     position: relative;
+    transition: width 0.15s ease;
+}
+
+.main-area.running {
+    width: 100%;
 }
 
 .scramble-display {

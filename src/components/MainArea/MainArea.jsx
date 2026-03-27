@@ -18,7 +18,7 @@ export default function MainArea({ timer, timerState }) {
 
   return (
     <div
-      className={`main-area${settings.backgroundImage ? ' has-bg' : ''}`}
+      className={`main-area${settings.backgroundImage ? ' has-bg' : ''}${timerState === 'running' ? ' running' : ''}`}
       ref={handleRef}
     >
       <ScrambleDisplay
