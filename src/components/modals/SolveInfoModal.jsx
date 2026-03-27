@@ -68,21 +68,21 @@ export default function SolveInfoModal({ index, onClose, setPenaltyCallback }) {
               id="penaltyOk"
               onClick={() => setPenalty('ok')}
             >
-              1 - OK
+              OK
             </button>
             <button
               className={`penalty-btn plus-two${penalty === 'plus2' ? ' active' : ''}`}
               id="penaltyPlusTwo"
               onClick={() => setPenalty('plus2')}
             >
-              2 - +2
+              +2
             </button>
             <button
               className={`penalty-btn dnf${penalty === 'dnf' ? ' active' : ''}`}
               id="penaltyDnf"
               onClick={() => setPenalty('dnf')}
             >
-              3 - DNF
+              DNF
             </button>
           </div>
         </div>
