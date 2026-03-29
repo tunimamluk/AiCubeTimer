@@ -143,6 +143,31 @@ body {
     transition: opacity 0.3s ease, visibility 0.3s ease;
 }
 
+.sidebar-logo-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    font-weight: 700;
+    font-size: 1.2rem;
+    letter-spacing: -0.02em;
+    align-self: center;
+    width: 100%;
+    padding: 0.7rem 1rem;
+    margin-bottom: -0.5rem;
+    border: none;
+    border-radius: 12px;
+    cursor: pointer;
+    background: linear-gradient(135deg, #3498db, #e74c3c);
+    color: #fff;
+    transition: opacity 0.2s ease, transform 0.15s ease;
+}
+
+.sidebar-logo-btn:hover {
+    opacity: 0.9;
+    transform: scale(1.02);
+}
+
 .sidebar.hidden {
     opacity: 0;
     visibility: hidden;

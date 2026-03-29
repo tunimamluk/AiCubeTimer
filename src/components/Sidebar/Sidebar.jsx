@@ -11,6 +11,10 @@ export default function Sidebar({ isOpen, onClose, onOpenSolve, onOpenSettings, 
     <div
       className={`sidebar${isOpen ? ' active' : ''}${hidden ? ' hidden' : ''}`}
     >
+      <button className="sidebar-logo-btn">
+        <img src="/favicon.svg" alt="cubit logo" width="28" height="28" />
+        <span>Cubit</span>
+      </button>
       <div style={{ display: 'flex', gap: '0.5rem', marginBottom: '0.5rem' }}>
         <button className="header-btn" style={{ flex: 1 }} onClick={onOpenSettings}>⚙️ Settings</button>
         <button className="header-btn" id="themeToggle" style={{ flex: 1 }} onClick={toggleTheme}>

@@ -6,7 +6,7 @@ import { useApp } from '../../context/AppContext';
 export default function MainArea({ timer, timerState }) {
   const { settings } = useApp();
   const areaRef = useRef(null);
-  const hidden = timerState === 'running' || timer.isHolding;
+  const hidden = timerState === 'running' || timerState === 'inspection' || timer.isHolding;
 
   // Bind touch events to the main area element
   const handleRef = (el) => {
@@ -18,7 +18,7 @@ export default function MainArea({ timer, timerState }) {
 
   return (
     <div
-      className={`main-area${settings.backgroundImage ? ' has-bg' : ''}${timer.isHolding || timerState === 'running' ? ' running' : ''}`}
+      className={`main-area${settings.backgroundImage ? ' has-bg' : ''}${timer.isHolding || timerState === 'running' || timerState === 'inspection' ? ' running' : ''}`}
       ref={handleRef}
     >
       <ScrambleDisplay

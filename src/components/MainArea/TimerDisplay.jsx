@@ -6,7 +6,7 @@ export default function TimerDisplay({ timerState, isHolding, displayTime, inspe
 
   if (timerState === 'inspection') {
     text = inspectionRemaining > 0 ? inspectionRemaining.toString() : '0';
-    className = 'timer-display';
+    className = 'timer-display running';
   } else if (timerState === 'running') {
     text = formatTime(displayTime);
     className = `timer-display running${isLong ? ' long-time' : ''}`;
