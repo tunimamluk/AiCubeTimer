@@ -1,4 +1,4 @@
-import { useRef, useState } from 'react';
+import { useRef, useState, useEffect } from 'react';
 import { useApp } from '../../context/AppContext';
 import { formatTime } from '../../utils/formatTime';
 
@@ -29,6 +29,12 @@ export default function SettingsModal({ onClose }) {
   const contentRef = useRef(null);
   const [copied, setCopied] = useState(false);
   const importFileRef = useRef(null);
+
+  useEffect(() => {
+    const handler = (e) => { if (e.key === 'Escape') onClose(); };
+    document.addEventListener('keydown', handler);
+    return () => document.removeEventListener('keydown', handler);
+  }, [onClose]);
 
   const scrollTo = (id) => {
     const el = document.getElementById(`section-${id}`);
