@@ -214,6 +214,21 @@ body {
     color: var(--text-secondary);
 }
 
+button.ao-selector {
+    background: none;
+    border: none;
+    padding: 0;
+    cursor: pointer;
+    font-weight: 600;
+    font-size: inherit;
+    color: var(--text-secondary);
+    font-family: inherit;
+}
+
+button.ao-selector:hover {
+    color: var(--accent);
+}
+
 .stat-value {
     font-family: 'Courier New', monospace;
     font-size: 1.1rem;
