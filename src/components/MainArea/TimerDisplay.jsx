@@ -1,6 +1,6 @@
 import { formatTime } from '../../utils/formatTime';
 
-export default function TimerDisplay({ timerState, displayTime, inspectionRemaining }) {
+export default function TimerDisplay({ timerState, isHolding, displayTime, inspectionRemaining }) {
   let text, className;
   const isLong = displayTime >= 60000;
 
@@ -12,7 +12,10 @@ export default function TimerDisplay({ timerState, displayTime, inspectionRemain
     className = `timer-display running${isLong ? ' long-time' : ''}`;
   } else if (timerState === 'ready') {
     text = '0.00';
-    className = 'timer-display ready';
+    className = `timer-display ready running${isLong ? ' long-time' : ''}`;
+  } else if (isHolding) {
+    text = formatTime(displayTime);
+    className = `timer-display running${isLong ? ' long-time' : ''}`;
   } else {
     text = formatTime(displayTime);
     className = `timer-display${isLong ? ' long-time' : ''}`;

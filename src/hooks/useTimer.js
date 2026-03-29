@@ -2,12 +2,13 @@ import { useState, useRef, useCallback, useEffect } from 'react';
 import { useApp } from '../context/AppContext';
 import { generateScramble } from '../utils/scramble';
 
-export function useTimer() {
+export function useTimer({ disabled = false } = {}) {
   const { settings, addSolve } = useApp();
   const settingsRef = useRef(settings);
   useEffect(() => { settingsRef.current = settings; }, [settings]);
 
   const [timerState, setTimerState] = useState('idle');
+  const [isHolding, setIsHolding] = useState(false);
   const [displayTime, setDisplayTime] = useState(0);
   const [inspectionRemaining, setInspectionRemaining] = useState(15);
   const [scramble, setScramble] = useState(() => generateScramble(settings.scrambleLength));
@@ -59,6 +60,7 @@ export function useTimer() {
         penalty: 'ok',
       });
     }
+    setIsHolding(false);
     setState('idle');
     nextScramble();
   }, [setState, nextScramble]);
@@ -81,6 +83,7 @@ export function useTimer() {
   // Keyboard handler — re-registers whenever relevant settings change
   const { holdTime, inputSource, inspectionEnabled } = settings;
   useEffect(() => {
+    if (disabled) return;
     const onKeyDown = (e) => {
       if (e.code !== 'Space') return;
       if (e.target.tagName === 'INPUT' || e.target.tagName === 'SELECT' || e.target.tagName === 'TEXTAREA') return;
@@ -104,7 +107,8 @@ export function useTimer() {
       }
 
       if (stateRef.current === 'idle') {
-        const ht = holdTime || 0;
+        setIsHolding(true);
+        const ht = (holdTime || 0) * 1000;
         if (ht > 0) {
           holdTimeoutRef.current = setTimeout(() => {
             if (isDownRef.current) {
@@ -139,6 +143,7 @@ export function useTimer() {
       if (stateRef.current === 'ready') {
         startTimer();
       } else if (stateRef.current !== 'running' && stateRef.current !== 'inspection') {
+        setIsHolding(false);
         setState('idle');
       }
     };
@@ -149,7 +154,7 @@ export function useTimer() {
       document.removeEventListener('keydown', onKeyDown);
       document.removeEventListener('keyup', onKeyUp);
     };
-  }, [startTimer, stopTimer, startInspection, setState, holdTime, inputSource, inspectionEnabled]);
+  }, [disabled, startTimer, stopTimer, startInspection, setState, holdTime, inputSource, inspectionEnabled]);
 
   // Penalty keybinds (1/2/3) — exposed via a penalty callback set by SolveInfoModal
   const penaltyCallbackRef = useRef(null);
@@ -186,7 +191,7 @@ export function useTimer() {
         return;
       }
       if (stateRef.current === 'idle' || stateRef.current === 'stopped') {
-        const holdTime = settingsRef.current.holdTime || 0;
+        const holdTime = (settingsRef.current.holdTime || 0) * 1000;
         holdTimeoutRef.current = setTimeout(() => {
           if (isDownRef.current) setState('ready');
         }, holdTime);
@@ -215,6 +220,7 @@ export function useTimer() {
 
   return {
     timerState,
+    isHolding,
     displayTime,
     inspectionRemaining,
     scramble,

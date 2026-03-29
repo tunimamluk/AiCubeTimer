@@ -4,7 +4,7 @@ import { useApp } from '../../context/AppContext';
 export default function SessionSelector() {
   const {
     sessions, sessionNames, currentSession, setCurrentSession,
-    createSession, renameSession, deleteSession,
+    createSession, renameSession, deleteSession, settings,
   } = useApp();
 
   const [optionsOpen, setOptionsOpen] = useState(false);
@@ -26,7 +26,7 @@ export default function SessionSelector() {
       alert('You cannot delete the last remaining session.');
       return;
     }
-    if (confirm(`Delete "${sessionNames[currentSession]}"? This cannot be undone.`)) {
+    if (!settings.confirmDelete || confirm(`Delete "${sessionNames[currentSession]}"? This cannot be undone.`)) {
       deleteSession(currentSession);
     }
   };

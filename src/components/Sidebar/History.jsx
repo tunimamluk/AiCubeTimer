@@ -2,12 +2,12 @@ import { useApp } from '../../context/AppContext';
 import { formatTime } from '../../utils/formatTime';
 
 export default function History({ onOpenSolve }) {
-  const { sessions, currentSession, deleteSolve } = useApp();
+  const { sessions, currentSession, deleteSolve, settings } = useApp();
   const solves = sessions[currentSession] || [];
 
   const handleDelete = (e, index) => {
     e.stopPropagation();
-    if (confirm('Are you sure you want to delete this time?')) {
+    if (!settings.confirmDelete || confirm('Are you sure you want to delete this time?')) {
       deleteSolve(index);
     }
   };

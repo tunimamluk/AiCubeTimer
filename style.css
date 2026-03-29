@@ -4,6 +4,21 @@
     box-sizing: border-box;
 }
 
+::view-transition-old(root) {
+    animation: none;
+    z-index: 0;
+}
+
+::view-transition-new(root) {
+    animation: theme-reveal 0.45s ease;
+    z-index: 1;
+}
+
+@keyframes theme-reveal {
+    from { clip-path: circle(0% at var(--vt-x, 50%) var(--vt-y, 50%)); }
+    to   { clip-path: circle(var(--vt-r, 150%) at var(--vt-x, 50%) var(--vt-y, 50%)); }
+}
+
 :root {
     --bg-primary: #1e1e2e;
     --bg-secondary: #181825;
@@ -980,3 +995,199 @@ body {
         max-height: 55vh;
     }
 }
+/* ── Room / Multiplayer ────────────────────────────────────────── */
+.room-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 500;
+  background: var(--bg-primary);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 2rem 1rem;
+  overflow-y: auto;
+}
+
+.room-overlay-center {
+  justify-content: center;
+}
+
+.room-panel {
+  width: 100%;
+  max-width: 480px;
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.room-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  flex-wrap: wrap;
+}
+
+.room-label {
+  font-size: 0.75rem;
+  color: var(--text-secondary);
+}
+
+.room-code {
+  font-family: var(--timer-font);
+  font-size: 1.6rem;
+  font-weight: bold;
+  color: var(--accent);
+  letter-spacing: 0.2em;
+}
+
+.room-participants {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.room-participant {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0.75rem 1rem;
+  background: var(--bg-secondary);
+  border-radius: 8px;
+}
+
+.room-tag {
+  font-size: 0.65rem;
+  padding: 0.1rem 0.4rem;
+  border-radius: 4px;
+  margin-left: 0.4rem;
+  vertical-align: middle;
+}
+.room-tag.you  { background: var(--accent); color: var(--bg-primary); }
+.room-tag.host { background: var(--bg-primary); color: var(--accent); border: 1px solid var(--accent); }
+
+.ready-badge {
+  font-size: 0.8rem;
+  padding: 0.2rem 0.6rem;
+  border-radius: 4px;
+}
+.ready-badge.ready   { color: var(--timer-ready); }
+.ready-badge.waiting { color: var(--text-secondary); }
+
+.room-actions {
+  display: flex;
+  justify-content: center;
+}
+
+.btn-room-action {
+  flex: 1;
+  background: var(--accent);
+  color: var(--bg-primary);
+  border: none;
+  border-radius: 8px;
+  padding: 0.75rem 1.5rem;
+  font-size: 1rem;
+  font-weight: bold;
+  cursor: pointer;
+  transition: opacity 0.15s;
+}
+.btn-room-action:hover    { opacity: 0.85; }
+.btn-room-action:disabled { opacity: 0.4; cursor: not-allowed; }
+.btn-room-action.cancel   { background: var(--delete-btn); }
+
+.room-info {
+  text-align: center;
+  color: var(--text-secondary);
+  font-size: 0.9rem;
+}
+
+.room-error {
+  text-align: center;
+  color: var(--delete-btn);
+  font-size: 0.9rem;
+}
+
+/* Countdown */
+.room-countdown-number {
+  font-family: var(--timer-font);
+  font-size: 14rem;
+  font-weight: bold;
+  color: var(--timer-running);
+  line-height: 1;
+  margin-bottom: 1rem;
+}
+
+/* Solving */
+.room-scramble {
+  font-size: 1.05rem;
+  color: var(--text-primary);
+  text-align: center;
+  max-width: 600px;
+  line-height: 1.7;
+  margin-bottom: 2rem;
+}
+
+.room-timer-display {
+  font-family: var(--timer-font);
+  font-size: 8rem;
+  font-weight: bold;
+  color: var(--text-primary);
+  line-height: 1;
+  margin: 1rem 0;
+}
+.room-timer-display.ready   { color: var(--timer-ready) !important; }
+.room-timer-display.running { color: var(--timer-running) !important; }
+
+.room-hint {
+  font-size: 0.8rem;
+  color: var(--text-secondary);
+  margin-bottom: 2rem;
+}
+
+.room-done {
+  text-align: center;
+  margin: 2rem 0;
+}
+.room-done-label { color: var(--text-secondary); font-size: 0.9rem; margin-bottom: 0.5rem; }
+.room-done-value { font-family: var(--timer-font); font-size: 5rem; color: var(--accent); line-height: 1; }
+
+.room-participants-mini {
+  width: 100%;
+  max-width: 400px;
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+}
+.room-participant-mini {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0.5rem 0.75rem;
+  background: var(--bg-secondary);
+  border-radius: 6px;
+  font-size: 0.9rem;
+}
+.result-done    { color: var(--accent); font-family: var(--timer-font); }
+.result-pending { color: var(--text-secondary); }
+
+/* Results */
+.room-results {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+.room-result-row {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  padding: 0.75rem 1rem;
+  background: var(--bg-secondary);
+  border-radius: 8px;
+}
+.room-result-row.mine { border: 1px solid var(--accent); }
+.result-rank  { font-size: 1.3rem; min-width: 2.2rem; }
+.result-name  { flex: 1; }
+.result-time  { font-family: var(--timer-font); font-size: 1.1rem; font-weight: bold; }
+
+/* header-btn danger variant */
+.header-btn.danger { color: var(--delete-btn); border-color: var(--delete-btn); }

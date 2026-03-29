@@ -3,12 +3,14 @@ import { createContext, useContext, useState, useEffect } from 'react';
 const DEFAULT_SETTINGS = {
   inputSource: 'keyboard',
   inspectionEnabled: false,
-  holdTime: 3,
+  holdTime: 0.3,
   scrambleLength: 20,
   autoSave: true,
+  confirmDelete: true,
   timerColor: null,
   timerFont: "'Courier New', monospace",
   backgroundImage: null,
+  autoDeleteBelow: 0,
 };
 
 const DEFAULT_SESSIONS = {
@@ -55,6 +57,18 @@ export function AppProvider({ children }) {
 
   const [theme, setTheme] = useState(() => localStorage.getItem('theme') || 'dark');
 
+  const toggleTheme = (e) => {
+    const next = theme === 'light' ? 'dark' : 'light';
+    if (!document.startViewTransition) { setTheme(next); return; }
+    const x = e?.clientX ?? window.innerWidth / 2;
+    const y = e?.clientY ?? 0;
+    const maxR = Math.hypot(Math.max(x, window.innerWidth - x), Math.max(y, window.innerHeight - y));
+    document.documentElement.style.setProperty('--vt-x', `${x}px`);
+    document.documentElement.style.setProperty('--vt-y', `${y}px`);
+    document.documentElement.style.setProperty('--vt-r', `${maxR}px`);
+    document.startViewTransition(() => setTheme(next));
+  };
+
   // Persist
   useEffect(() => {
     localStorage.setItem('timerSettings', JSON.stringify(settings));
@@ -92,6 +106,11 @@ export function AppProvider({ children }) {
   const updateSettings = (updates) => setSettings(prev => ({ ...prev, ...updates }));
 
   const addSolve = (solve) => {
+    if (settings.autoDeleteBelow > 0) {
+      const penalty = solve.penalty || 'ok';
+      const t = penalty === 'plus2' ? solve.time + 2000 : solve.time;
+      if (penalty !== 'dnf' && t < settings.autoDeleteBelow * 1000) return;
+    }
     setSessions(prev => ({
       ...prev,
       [currentSession]: [solve, ...(prev[currentSession] || [])],
@@ -146,6 +165,7 @@ export function AppProvider({ children }) {
     setCurrentSession('session1');
   };
 
+
   const importData = (data) => {
     if (data.sessions) setSessions(prev => ({ ...prev, ...data.sessions }));
     if (data.sessionNames) setSessionNames(prev => ({ ...prev, ...data.sessionNames }));
@@ -156,7 +176,7 @@ export function AppProvider({ children }) {
       settings, updateSettings,
       sessions, currentSession, setCurrentSession,
       sessionNames,
-      theme, setTheme,
+      theme, setTheme, toggleTheme,
       addSolve, deleteSolve, updateSolvePenalty,
       createSession, renameSession, deleteSession,
       clearSession, clearAll, importData,

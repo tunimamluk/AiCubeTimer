@@ -1,7 +1,7 @@
 import { useApp } from '../context/AppContext';
 
-export default function Header({ onToggleSidebar, sidebarOpen, timerState }) {
-  const hidden = timerState === 'running';
+export default function Header({ onToggleSidebar, sidebarOpen, timerState, isHolding }) {
+  const hidden = timerState === 'running' || isHolding;
 
   return (
     <button

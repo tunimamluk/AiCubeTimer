@@ -149,10 +149,10 @@ export default function SettingsModal({ onClose }) {
               <div className="setting-item">
                 <div>
                   <div className="setting-label">Hold Time</div>
-                  <div className="setting-description">Time to hold before ready (ms)</div>
+                  <div className="setting-description">Time to hold before ready (seconds)</div>
                 </div>
                 <div className="setting-control">
-                  <input type="number" min="0" max="2000" value={settings.holdTime} onChange={e => updateSettings({ holdTime: Number(e.target.value) })} />
+                  <input type="number" min="0" max="2" step="0.1" value={settings.holdTime} onChange={e => updateSettings({ holdTime: Number(e.target.value) })} />
                 </div>
               </div>
             </div>
@@ -181,6 +181,30 @@ export default function SettingsModal({ onClose }) {
                 </div>
                 <div className="setting-control">
                   <input type="checkbox" checked={settings.autoSave} onChange={e => updateSettings({ autoSave: e.target.checked })} />
+                </div>
+              </div>
+              <div className="setting-item">
+                <div>
+                  <div className="setting-label">Auto-Delete Solves Below</div>
+                  <div className="setting-description">Automatically discard solves faster than this (seconds, 0 = off)</div>
+                </div>
+                <div className="setting-control">
+                  <input
+                    type="number"
+                    min="0"
+                    step="1"
+                    value={settings.autoDeleteBelow}
+                    onChange={e => updateSettings({ autoDeleteBelow: Number(e.target.value) })}
+                  />
+                </div>
+              </div>
+              <div className="setting-item">
+                <div>
+                  <div className="setting-label">Confirm Before Deleting</div>
+                  <div className="setting-description">Show a warning when deleting results</div>
+                </div>
+                <div className="setting-control">
+                  <input type="checkbox" checked={settings.confirmDelete !== false} onChange={e => updateSettings({ confirmDelete: e.target.checked })} />
                 </div>
               </div>
             </div>
@@ -262,10 +286,10 @@ export default function SettingsModal({ onClose }) {
             {/* DANGER */}
             <div className="settings-section danger-zone" id="section-danger">
               <h3 style={{ color: 'var(--delete-btn)' }}>⚠️ Danger Zone</h3>
-              <button className="danger-btn" onClick={() => { if (confirm('Clear all times in this session?')) clearSession(currentSession); }}>
+              <button className="danger-btn" onClick={() => { if (!settings.confirmDelete || confirm('Clear all times in this session?')) clearSession(currentSession); }}>
                 🗑️ Clear Current Session
               </button>
-              <button className="danger-btn" style={{ marginTop: '0.75rem' }} onClick={() => { if (confirm('Delete ALL data? This cannot be undone.')) clearAll(); }}>
+              <button className="danger-btn" style={{ marginTop: '0.75rem' }} onClick={() => { if (!settings.confirmDelete || confirm('Delete ALL data? This cannot be undone.')) clearAll(); }}>
                 💥 Clear All Data
               </button>
             </div>
